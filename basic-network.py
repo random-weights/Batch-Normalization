@@ -49,8 +49,11 @@ for i in range(5):
 
 y_pred = tf.nn.softmax(logits = z)
 _,acc = tf.metrics.accuracy(tf.argmax(y_pred,axis = 1),tf.argmax(y_actual,axis = 1))
+norm = 0
+for w in weights:
+    norm += tf.norm(w,ord= 2,axis = None)
 
-loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits = z,labels = y_actual))
+loss = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(logits = z,labels = y_actual))+norm
 
 opt = tf.train.GradientDescentOptimizer(learning_rate=alpha)
 train = opt.minimize(loss)
@@ -63,7 +66,7 @@ with tf.Session() as sess:
     train_data = Data()
     train_data.setDataPaths(x_path = "data/x_train.csv",y_path="data/y_train.csv")
     train_data.getAllData()
-    ls_fname = ["basic_run_"+str(i)+".csv" for i in range(1,6)]
+    ls_fname = ["basic_norm_run_"+str(i)+".csv" for i in range(1,6)]
     ls_fh = [open(file,'a') for file in ls_fname]
     ls_alpha = [0.001,0.005,0.01,0.05,0.1]
     for a in range(5):
